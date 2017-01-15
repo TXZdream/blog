@@ -1,0 +1,30 @@
+#main {
+  margin-left: 1%;
+  margin-right: 1%;
+}
+
+#list {
+  float: left;
+  width: 30%;
+  margin-left: 5px;
+}
+
+#content {
+  float: right;
+  width: 66%;
+  margin-right: 5px;
+}
+
+.card {
+  height: 80%;
+  padding: 2px;
+  margin: 5px 15px 0 15px;
+}
+
+.list{
+  margin: 5px 15px 0 15px;
+}
+
+.content {
+  margin: 5px 55px 0 55px;
+}
