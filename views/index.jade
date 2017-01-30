@@ -14,26 +14,30 @@ html
       div(ng-controller="userLogin" id="head")
         br
         md-toolbar
-      div(ng-controller="blogList")
-        div(id="list")
-          br
-          md-card(class="card")
-            md-input-container(class="md-block")
-              label 搜索 标题、作者或标签
-              input(ng-model="findMessage")
-            md-content(flex)
-              div(class="list")
-                md-list
-                  md-list-item(class="md-3-line" ng-repeat="item in list" ng-click="changeContent(item)")
-                    h3 {{item.title}}
-                    h4 {{item.author}}
-        div(ng-controller="blogContent" id="content")
-          br
-          md-card(class="card")
-            md-content(flex)
-              div(class="content")
-                h1 {{articleContent.title}}
-                h2 {{articleContent.author}}
-                p {{articleContent.content}}
-       
-          
+          div(class="md-toolbar-tools")
+            md-button BACK
+            h2 BLOG
+            span(flex="")
+            md-button(class="md-fab md-mini" ng-click="showLoginDialog($event)")
+              md-icon(md-svg-src="images/icon/default.svg")
+        div(ng-controller="blogList")
+          div(id="list")
+            br
+            md-card(class="card")
+              md-input-container(class="md-block")
+                label 搜索 标题、作者或标签
+                input(ng-model="findMessage")
+              md-content(flex)
+                div(class="list")
+                  md-list
+                    md-list-item(class="md-3-line" ng-repeat="item in list" ng-click="changeContent(item)")
+                      h3 {{item.title}}
+                      h4 {{item.author}}
+          div(ng-controller="blogContent" id="content")
+            br
+            md-card(class="card")
+              md-content(flex)
+                div(class="content")
+                  h1 {{articleContent.title}}
+                  h2 {{articleContent.author}}
+                  p {{articleContent.content}}

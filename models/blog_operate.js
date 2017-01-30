@@ -1,9 +1,10 @@
 var mongoClient = require('mongodb').MongoClient;
-var url = 'mongodb://localhost:27010/blog';
+var url = 'mongodb://localhost:27017/blog';
 var assert = require('assert');
+var op = {};
 
 // Insert data to database without checking if it is valid.
-var insertBlog = function (data) {
+op.insertBlog = function (data) {
     mongoClient.connect(url, function(err, db) {
         if (err) {
             console.log("Connect to database failed!");
@@ -24,12 +25,12 @@ var insertBlog = function (data) {
 }
 
 // Later I will rewrite this function with correct para.
-var updateBlog = function (id, data) {
+op.updateBlog = function (id, data) {
 
 }
 
 // Find blog with author, return an array of the blog.
-var findBlogByAuthor = function (author) {
+op.findBlogByAuthor = function (author) {
     mongoClient.connect(url, function(err, db) {
         if (err) {
             console.log("Connect to database failed!");
@@ -52,7 +53,7 @@ var findBlogByAuthor = function (author) {
 }
 
 // Find blog with author, return an array of the blog.
-var findBlogByTitle = function (title) {
+op.findBlogByTitle = function (title) {
     mongoClient.connect(url, function(err, db) {
         if (err) {
             console.log("Connect to database failed!");
@@ -75,7 +76,7 @@ var findBlogByTitle = function (title) {
 }
 
 // Find blog with tag, return an array of the blog.
-var findBlogByTag = function (tag) {
+op.findBlogByTag = function (tag) {
     mongoClient.connect(url, function(err, db) {
         if (err) {
             console.log("Connect to database failed!");
@@ -98,24 +99,19 @@ var findBlogByTag = function (tag) {
 }
 
 // Find all blog, return an array of the blog.
-var findAllBlog = function () {
+op.findAllBlog = function (callback) {
     mongoClient.connect(url, function(err, db) {
         if (err) {
             console.log("Connect to database failed!");
             console.log(err);
         } else {
             console.log("Connect to database success!");
-            db.collection('blogContent').find().toArray(function(err, arr) {
-                if (err) {
-                    console.log("Find all data failed.");
-                    console.log(err);
-                    return null;
-                } else {
-                    console.log("Find all data success.");
-                    return arr;
-                }
+            var ret = db.collection('blogContent').find().toArray().then(function(ret) {
+                callback(ret);
             });
         }
         db.close();
     });
 }
+
+module.exports = op;

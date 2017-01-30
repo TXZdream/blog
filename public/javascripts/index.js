@@ -1,11 +1,19 @@
-var app= angular.module('blog', ['ngMaterial']);
+var app = angular.module('blog', ['ngMaterial']);
 
 app.controller('userLogin', userLogin);
 app.controller('blogList', blogList);
 app.controller('blogContent', blogContent);
 
-function userLogin($scope) {
-    
+function userLogin($scope, $mdDialog) {
+    $scope.showLoginDialog = function(ev) {
+        $mdDialog.show({
+            parent: angular.element(document.body),
+            controller: userLogin,
+            targetEvent: ev,
+            templateUrl: 'html/login.html',
+            clickOutsideToClose: true
+        });
+    }
 }
 
 function blogList($scope) {

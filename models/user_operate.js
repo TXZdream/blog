@@ -1,5 +1,5 @@
 var mongoClient = require('mongodb').MongoClient;
-var url = 'mongodb://localhost:27010/blog';
+var url = 'mongodb://localhost:27017/blog';
 
 var addUser = function(data) {
     mongoClient.connect(url, function(err, db) {
@@ -27,25 +27,18 @@ var updatePasswdWithPassword = function(user, oldPasswd, newPasswd) {
             console.log(err);
         } else {
             var passwd = require('crypto').createHash('md5').update(oldPasswd).digest('hex');
-            db.collection('user').findOne({'name': user}, function(err, ret) {
-                if (err) {
-                    console.log('Change password failed.');
-                    console.log(err);
-                } else {
-                    if (ret.passwd == passwd) {
-                        var change = require('crypto').createHash('md5').update(newPasswd).digest('hex');
-                        ret.passwd = change;
-                        db.collection('user').updateOne({'name': user}, ret, function(err, ret) {
-                            if (err) {
-                                console.log("Update password failed.");
-                                console.log(err);
-                            } else {
-                                console.log("Update password succeed!");
-                            }
-                        });
+            var ret = db.collection('user').findOne({'name': user});
+            if (ret) {
+                if (passwd == ret.passwd) {
+                    var replacePasswd = require('crypto').createHash('md5').update(newPasswd).digest('hex');
+                    try {
+                        db.collection('user').updateOne({'name': user},{$set: {'passwd': replacePasswd}});
+                    } catch (err) {
+                        console.log("Update password failed.");
+                        console.log("err");
                     }
                 }
-            });
+            }
         }
     });
 }
