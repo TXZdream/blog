@@ -16,25 +16,23 @@ function userLogin($scope, $mdDialog) {
     }
 }
 
-function blogList($scope) {
+function blogList($scope, $http) {
     // Message for finding.
     $scope.findMessage = "";
     // Article list.
     $scope.list = [];
     // Get list from server.
     $scope.getList = function() {
-        $scope.list = [
-            {
-                "author": "tangxz",
-                "title": "Hello World!",
-                "content": "No more content here."
-            },
-            {
-                "author": "tangxz1",
-                "title": "Hello World!!",
-                "content": "No more content here."
-            }
-        ];
+        $http({
+            method: 'GET',
+            url: '/showall'
+        }).success(function(data, status) {
+            console.log(data[0]);
+            $scope.list = data;
+        }).error(function(data, status) {
+            console.log('Error, status: ' + status + '.');
+            console.log(data);
+        });
     }
     // Change content to show.
     $scope.changeContent = function(item) {
