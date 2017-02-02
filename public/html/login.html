@@ -1,44 +1,58 @@
 <md-dialog flex=50>
     <md-card>
-        <md-tabs md-center-tabs="true">
-            <md-tab label="登录">
-                <h1>登录</h1>
-                <form novalidate>
-                    <div class="input">
-                        <md-input-container>
-                            <label>学号</label>
-                            <input ng-model="login.id" />
-                        </md-input-container>
-                        <md-input-container>
-                            <label>密码</label>
-                            <input type="password" />
-                        </md-input-container>
-                    </div>
-                    <div class="button">
-                        <md-button class="md-raised md-primary">提交</md-button>
-                        <md-button class="md-raised md-warn">重置</md-button>
-                    </div>
-                </form>
-            </md-tab>
-            <md-tab label="注册">
-                <h1>注册</h1>
-                <form novalidate>
-                    <div class="input">
-                        <md-input-container>
-                            <label>学号</label>
-                            <input ng-model="login.id" />
-                        </md-input-container>
-                        <md-input-container>
-                            <label>密码</label>
-                            <input type="password" />
-                        </md-input-container>
-                    </div>
-                    <div class="button">
-                        <md-button class="md-raised md-primary">提交</md-button>
-                        <md-button class="md-raised md-warn">重置</md-button>
-                    </div>
-                </form>
-            </md-tab>
-        </md-tabs>
+        <div>
+            <md-tabs md-center-tabs="true" style="min-height: 400px">
+                <md-tab label="登录">
+                    <h1>登录</h1>
+                    <form novalidate>
+                        <div class="input">
+                            <md-input-container>
+                                <label>用户名</label>
+                                <input ng-model="login.user" />
+                            </md-input-container>
+                            <md-input-container>
+                                <label>密码</label>
+                                <input type="password" ng-model="login.passwd"/>
+                            </md-input-container>
+                        </div>
+                        <div class="button">
+                            <md-button class="md-raised md-primary" ng-click="login_upload()">提交</md-button>
+                            <md-button class="md-raised md-warn" ng-click="reset()">重置</md-button>
+                        </div>
+                    </form>
+                </md-tab>
+                <md-tab label="注册">
+                    <h1>注册</h1>
+                    <form novalidate>
+                        <div class="input">
+                            <md-input-container>
+                                <label>用户名</label>
+                                <input ng-model="reg.user" />
+                            </md-input-container>
+                            <md-input-container>
+                                <label>电话</label>
+                                <input ng-model="reg.phone" />
+                            </md-input-container>
+                            <md-input-container>
+                                <label>邮箱</label>
+                                <input ng-model="reg.email" />
+                            </md-input-container>
+                            <md-input-container>
+                                <label>密码</label>
+                                <input type="password" ng-model='reg.passwd'/>
+                            </md-input-container>
+                            <md-input-container>
+                                <label>确认密码</label>
+                                <input type="password" ng-model='reg.con_passwd'/>
+                            </md-input-container>
+                        </div>
+                        <div class="button">
+                            <md-button class="md-raised md-primary" ng-click="register_upload()">提交</md-button>
+                            <md-button class="md-raised md-warn" ng-click="reset()">重置</md-button>
+                        </div>
+                    </form>
+                </md-tab>
+            </md-tabs>
+        </div>
     </md-card>
 </md-dialog>

@@ -1,18 +1,35 @@
 var mongoClient = require('mongodb').MongoClient;
 var url = 'mongodb://localhost:27017/blog';
+var op = {};
 
-var addUser = function(data) {
+op.addUser = function(data, callback) {
+    console.log(data);
     mongoClient.connect(url, function(err, db) {
         if (err) {
             console.log("Connect to database failed!");
             console.log(err);
+            callback('Failed: ' + err);
         } else {
-            db.collection('user').insert(data, function(err, ret) {
+            db.collection('user').findOne({'name': data.name}, function(err, ret) {
                 if (err) {
-                    console.log("Insert data to user table failed.");
+                    console.log('Find failed.');
                     console.log(err);
                 } else {
-                    console.log('Insert data to user table success.');
+                    console.log(ret);
+                    if (!ret) {
+                        db.collection('user').insert(data, function(err, ret) {
+                            if (err) {
+                                console.log("Insert data to user table failed.");
+                                console.log(err);
+                                callback('Failed: ' + err);
+                            } else {
+                                console.log('Insert data to user table success.');
+                                callback('');
+                            }
+                        });
+                    } else {
+                        callback('Failed: Exists username.');
+                    }
                 }
             });
         }
@@ -20,7 +37,7 @@ var addUser = function(data) {
 }
 
 // Unique username, change password with old password.
-var updatePasswdWithPassword = function(user, oldPasswd, newPasswd) {
+op.updatePasswdWithPassword = function(user, oldPasswd, newPasswd) {
     mongoClient.connect(url, function(err, db) {
         if (err) {
             console.log("Connect to database failed!");
@@ -43,18 +60,41 @@ var updatePasswdWithPassword = function(user, oldPasswd, newPasswd) {
     });
 }
 
-var deleteUser = function(user, passwd) {
+op.deleteUser = function(user, passwd) {
     
 }
 
-var updateMessage = function(item, value, passwd) {
+op.updateMessage = function(item, value, passwd) {
 
 }
 
-var disableUser = function(name, time) {
+op.disableUser = function(name, time) {
 
 }
 
-var checkPasswd = function(name, passwd) {
-    
+op.checkPasswd = function(name, passwd, callback) {
+    mongoClient.connect(url, function(err, db) {
+        if (err) {
+            console.log("Connect to database failed!");
+            console.log(err);
+        } else {
+            var Spasswd = require('crypto').createHash('md5').update(passwd).digest('hex');
+            var ret = db.collection('user').findOne({'name': name, 'passwd': Spasswd}, function(err, ret) {
+                if (err) {
+                    console.log('Find failed.');
+                    cosole.log(err);
+                } else {
+                    if (ret) {
+                        console.log("Find user with true password.");
+                        callback('');
+                    } else {
+                        console.log('Failed: Invalid user or password.');
+                        callback('Failed: Invalid user or password.');
+                    }
+                }
+            });
+        }
+    });
 }
+
+module.exports = op;

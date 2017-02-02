@@ -4,19 +4,43 @@ var assert = require('assert');
 var op = {};
 
 // Insert data to database without checking if it is valid.
-op.insertBlog = function (data) {
+op.insertBlog = function (data, callback) {
     mongoClient.connect(url, function(err, db) {
         if (err) {
             console.log("Connect to database failed!");
             console.log(err);
+            callback('Falied: Connect to database failed!');
         } else {
             console.log("Connect to database success!");
-            db.collection('blogContent').insertOne(data, function (err, ret) {
+            db.collection('blogContent').insert(data, function (err, ret) {
                 if (err) {
                     console.log("Insert failed!");
                     console.log(err);
+                    callback('Failed: Insert failed.');
                 } else {
                     console.log("Insert data to blogContent table success");
+                    callback();
+                }
+            });
+        }
+        db.close();
+    });
+}
+
+op.deleteBlog = function(title, author, callback) {
+    mongoClient.connect(url, function(err, db) {
+        if (err) {
+            console.log("Connect to database failed!");
+            console.log(err);
+            callback('Falied: Connect to database failed!');
+        } else {
+            db.collection('blogContent').deleteOne({'author': author, 'title': title}, function(err, ret) {
+                if (err) {
+                    console.log('Delete data failed.');
+                    console.log(err);
+                    callback('Failed: ' + err);
+                } else {
+                    console.log('Delete data success.');
                 }
             });
         }
@@ -110,7 +134,6 @@ op.findAllBlog = function (callback) {
                 callback(ret);
             });
         }
-        db.close();
     });
 }
 

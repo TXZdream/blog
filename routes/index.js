@@ -1,6 +1,10 @@
 var express = require('express');
 var router = express.Router();
 var blog_op = require('../models/blog_operate');
+var bodyParser = require('body-parser');
+var app = express();
+
+app.use(bodyParser());
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -15,18 +19,16 @@ router.get('/showall', function(req, res, next) {
   });
 });
 
-router.get('/login', function(req, res, next) {
-  
-});
-
-router.get('/insert', function(req, res, next) {
+router.post('/insertblog', function(req, res, next) {
   console.log('Insert');
-  blog_op.insertBlog({
-                "author": "tangxz1",
-                "title": "Hello World!!",
-                "content": "No more content here."
-            });
-  res.end();
+  console.log(req.body);
+  blog_op.insertBlog(req.body, function(data) {
+    if (data) {
+      res.end(data);
+    } else {
+      res.end('Success');
+    }
+  });
 });
 
 module.exports = router;
