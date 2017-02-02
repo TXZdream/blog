@@ -28,7 +28,7 @@ op.addUser = function(data, callback) {
                             }
                         });
                     } else {
-                        callback('Failed: Exists username.');
+                        callback('Used');
                     }
                 }
             });
@@ -90,6 +90,30 @@ op.checkPasswd = function(name, passwd, callback) {
                     } else {
                         console.log('Failed: Invalid user or password.');
                         callback('Failed: Invalid user or password.');
+                    }
+                }
+            });
+        }
+    });
+}
+
+op.findUser = function(name, callback) {
+    mongoClient.connect(url, function(err, db) {
+        if (err) {
+            console.log("Connect to database failed!");
+            console.log(err);
+        } else {
+            db.collection('user').findOne({'name': data.name}, function(err, ret) {
+                if (err) {
+                    console.log('Find failed.');
+                    console.log(err);
+                } else {
+                    console.log(ret);
+                    if (ret) {
+                        callback('Existed');
+                    } else {
+                        console.log('Can be used.');
+                        callback('');
                     }
                 }
             });

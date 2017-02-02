@@ -29,7 +29,6 @@ router.post('/login', function(req, res, next) {
 
 router.post('/register', function(req, res, next) {
   console.log('Post data to /users/register.');
-  console.log(req.body);
   if (reg_check(req.body))
     var Spasswd = require('crypto').createHash('md5').update(req.body.passwd).digest('hex');
     user_op.addUser({'name': req.body.user,
@@ -39,12 +38,27 @@ router.post('/register', function(req, res, next) {
     }, function(err) {
       if (err) {
         console.log(err);
-        res.end('Failed');
+        if (err == 'Used') {
+          res.end('Used');
+        } else {
+          res.end('Failed');
+        }
       } else {
         console.log('Register success.');
         res.end('Success');
       }
     });
+});
+
+router.get('/check', function(e9req, res, next) {
+  console.log('Check if the username has been used.');
+  user_op.findUser(req.query.user, function(ret) {
+    if (ret == '') {
+      res.end('');
+    } else {
+      res.end('Used');
+    }
+  });
 });
 
 var reg_check = function(data) {

@@ -9,6 +9,86 @@ app.controller('addBlogDialog', addBlogDialog);
 app.factory('shareBetweenLoginAndDialog', shareBetweenLoginAndDialog);
 
 function loginDialogContent($scope, $http, $mdDialog, $rootScope, shareBetweenLoginAndDialog) {
+    // Form validation.
+    $scope.errorMessage = {
+        login: "",
+        reg: ""
+    };
+    $scope.checkAll = function() {
+        if ($scope.checkUser() && $scope.checkPhone() && $scope.checkEmail() && $scope.checkPasswd() && $scope.checkCpasswd()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    $scope.checkUser = function() {
+        /*
+        * 1. 长度限制在3到15之间
+        * 2. 未被注册
+        */
+        if ($scope.reg.user.length < 3 || $scope.reg.user.length > 15) {
+            $scope.errorMessage.reg = "用户名长度应在3到15之间";
+            return false;
+        } else {
+            $scope.errorMessage.reg = "";
+            return true;
+        }
+    }
+    $scope.checkPhone = function() {
+        /*
+        * 1. 全是数字
+        * 2. 长度为11位
+        */
+        var reg = /[^0-9]/;
+        if ($scope.reg.phone.length == 11 && !reg.test($scope.reg.phone.length)) {
+            $scope.errorMessage.reg = "";
+            return true;
+        } else {
+            $scope.errorMessage.reg = "请输入正确的号码";
+            return false;
+        }
+    }
+    $scope.checkEmail = function() {
+        /*
+        * 1. 含有@
+        * 2. .在@之后
+        * 3. 含有.
+        */
+        var reg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/;
+        if (reg.test($scope.reg.email)) {
+            $scope.errorMessage.reg = "";
+            return true;
+        } else {
+            $scope.errorMessage.reg = "请注意邮箱格式";
+            return false;
+        }
+    }
+    $scope.checkPasswd = function() {
+        /*
+        * 1. 长度在8-16之间
+        */
+        if ($scope.reg.passwd.length >= 8 && $scope.reg.passwd.length <= 16) {
+            $scope.errorMessage.reg = "";
+            return true;
+        } else {
+            $scope.errorMessage.reg = "密码长度应在8-16位之间";
+            return false;
+        }
+    }
+    $scope.checkCpasswd = function() {
+        /*
+        * 1. 和密码一致
+        */
+        if ($scope.reg.passwd == $scope.reg.con_passwd) {
+            $scope.errorMessage.reg = "";
+            return true;
+        } else {
+            $scope.errorMessage.reg = "再次输入和密码应一致";
+            return false;
+        }
+    }
+    // Input messages.
+    $scope.isKeep = true;
     $scope.login = {
         'user': '',
         'passwd': ''
@@ -20,9 +100,11 @@ function loginDialogContent($scope, $http, $mdDialog, $rootScope, shareBetweenLo
         'passwd': '',
         'con_passwd': ''
     }
+    // Button event.
     $scope.reset = function() {
         $scope.login = {};
         $scope.reg = {};
+        $scope.errorMessage = {};
     }
     $scope.login_upload = function() {
         $http({
@@ -31,30 +113,39 @@ function loginDialogContent($scope, $http, $mdDialog, $rootScope, shareBetweenLo
             data: $scope.login
         }).success(function(data, status) {
             if (data == 'Success') {
-                // $scope.user = $scope.login.id;
                 shareBetweenLoginAndDialog.setUser($scope.login.user);
                 $rootScope.$broadcast('updateCurrentUserMessage', '');
+                if ($scope.isKeep) {
+                    Cookies.set('user', $scope.login.user, {expires: 30, path: 'importext.com'});
+                }
                 $mdDialog.hide();
-                Cookies.set('user', $scope.login.user, {expires: 30, path: 'importext.com'});
             } else {
+                Cookies.remove('user', {path: 'importext.com'});
                 shareBetweenLoginAndDialog.clearUser();
+                $scope.errorMessage.login = "当前用户名和密码的组合有误，请查证后重新输入。";
                 console.log('Login failed.');
             }
         });
     }
     $scope.register_upload = function() {
-        $http({
-            method: 'POST',
-            url: '/users/register',
-            data: $scope.reg
-        }).success(function(data, status) {
-            if (data == 'Success') {
-                console.log('Register success.');
-                $mdDialog.hide();
-            } else {
-                console.log('Register failed.');
-            }
-        })
+        if ($scope.checkAll()) {
+            $http({
+                method: 'POST',
+                url: '/users/register',
+                data: $scope.reg
+            }).success(function(data, status) {
+                if (data == 'Success') {
+                    console.log('Register success.');
+                    $mdDialog.hide();
+                } else if (data == 'Used') {
+                    console.log('Username existed');
+                    $scope.errorMessage.reg = "该用户名已被使用";
+                } else {
+                    console.log('Register failed.');
+                    $scope.errorMessage.reg = "注册失败，请稍后重试";
+                }
+            });
+        }
     }
 }
 

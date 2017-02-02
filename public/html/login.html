@@ -1,51 +1,57 @@
 <md-dialog flex=50>
-    <md-card>
+    <md-card style="padding: 20px">
         <div>
-            <md-tabs md-center-tabs="true" style="min-height: 400px">
+            <md-tabs md-center-tabs="true" style="min-height: 450px">
                 <md-tab label="登录">
                     <h1>登录</h1>
-                    <form novalidate>
-                        <div class="input">
+                    <form>
+                        <div>
                             <md-input-container>
                                 <label>用户名</label>
-                                <input ng-model="login.user" />
+                                <input ng-model="login.user" required />
                             </md-input-container>
                             <md-input-container>
                                 <label>密码</label>
-                                <input type="password" ng-model="login.passwd"/>
+                                <input type="password" ng-model="login.passwd" required />
                             </md-input-container>
+                            <br />
+                            <md-checkbox ng-model="isKeep">
+                                三十天内自动登录
+                            </md-checkbox>
                         </div>
+                        <div style="color: red">{{errorMessage.login}}</div>
                         <div class="button">
-                            <md-button class="md-raised md-primary" ng-click="login_upload()">提交</md-button>
+                            <md-button class="md-raised md-primary" ng-click="login_upload()" ng-disabled="!login.passwd&&login.user">提交</md-button>
                             <md-button class="md-raised md-warn" ng-click="reset()">重置</md-button>
                         </div>
                     </form>
                 </md-tab>
                 <md-tab label="注册">
                     <h1>注册</h1>
-                    <form novalidate>
+                    <form>
                         <div class="input">
                             <md-input-container>
                                 <label>用户名</label>
-                                <input ng-model="reg.user" />
+                                <input ng-model="reg.user" ng-keyup="checkUser()" />
                             </md-input-container>
                             <md-input-container>
                                 <label>电话</label>
-                                <input ng-model="reg.phone" />
+                                <input ng-model="reg.phone" ng-keyup="checkPhone()" />
                             </md-input-container>
                             <md-input-container>
                                 <label>邮箱</label>
-                                <input ng-model="reg.email" />
+                                <input ng-model="reg.email" type="email" ng-keyup="checkEmail()" />
                             </md-input-container>
                             <md-input-container>
                                 <label>密码</label>
-                                <input type="password" ng-model='reg.passwd'/>
+                                <input type="password" ng-model='reg.passwd' ng-keyup="checkPasswd()" />
                             </md-input-container>
                             <md-input-container>
                                 <label>确认密码</label>
-                                <input type="password" ng-model='reg.con_passwd'/>
+                                <input type="password" ng-model='reg.con_passwd' ng-keyup="checkCpasswd()" />
                             </md-input-container>
                         </div>
+                        <div style="color: red">{{errorMessage.reg}}</div>
                         <div class="button">
                             <md-button class="md-raised md-primary" ng-click="register_upload()">提交</md-button>
                             <md-button class="md-raised md-warn" ng-click="reset()">重置</md-button>
