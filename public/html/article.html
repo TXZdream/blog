@@ -1,21 +1,25 @@
 <md-dialog flex=90>
     <div style="height: 800px; margin: 20px">
-        <h2>新增博客</h2>
+        <h2>{{mode}}博客</h2>
         <form>
             <md-input-container>
                 <label>标题</label>
-                <input ng-model="blog.title" />
+                <input ng-model="blog.title" required />
             </md-input-container>
-            <div>
+            <div ng-if="ifTagShow">
                 <md-chips ng-model="blog.tags" placeholder="请输入标签(最多6个)" md-max-chips="6"></md-chips>
             </div>
             <br />
-            <md-input-container style="width: 100%">
-                <label>正文</label>
+            <!--<md-input-container style="width: 100%">
+                <label>正文(仅支持文本内容)</label>
                 <textarea ng-model="blog.content" style="height: 500px" max-rows=15 md-detect-hidden="true"></textarea>
             </md-input-container>
+            <p style="color: red">{{errorMessage}}</p>-->
+            <div class="contain app">
+                <div text-angular="text-angular" ng-model="blog.content"></div>
+            </div>
             <div class="button">
-                <md-button class="md-raised md-primary" ng-click="upload()">提交</md-button>
+                <md-button class="md-raised md-primary" ng-click="upload()" ng-disabled="!blog.title">提交</md-button>
                 <md-button class="md-raised md-warn" ng-click="hide()">关闭(不保存)</md-button>
             </div>
         </form>

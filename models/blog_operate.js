@@ -1,7 +1,38 @@
 var mongoClient = require('mongodb').MongoClient;
 var url = 'mongodb://localhost:27017/blog';
 var assert = require('assert');
+var user_op = require('./user_operate');
 var op = {};
+
+op.checkSame = function(id, callback) {
+    mongoClient.connect(url, function(err, db) {
+        if (err) {
+            console.log("Connect to database failed!");
+            console.log(err);
+            db.close();
+            callback('Falied: Connect to database failed!');
+        } else {
+            console.log("Connect to database success!");
+            db.collection('blogContent').findOne({'id': id}, function(err, ret) {
+                if (err) {
+                    console.log('Failed: Find blog failed.');
+                    db.close();
+                    callback('Failed');
+                } else {
+                    if (ret) {
+                        console.log('Exist same blog.');
+                        db.close();
+                        callback('true');
+                    } else {
+                        console.log('No same blog.');
+                        db.close();
+                        callback('false');
+                    }
+                }
+            });
+        }
+    });
+}
 
 // Insert data to database without checking if it is valid.
 op.insertBlog = function (data, callback) {
@@ -9,48 +40,93 @@ op.insertBlog = function (data, callback) {
         if (err) {
             console.log("Connect to database failed!");
             console.log(err);
+            db.close();
             callback('Falied: Connect to database failed!');
         } else {
             console.log("Connect to database success!");
-            db.collection('blogContent').insert(data, function (err, ret) {
-                if (err) {
-                    console.log("Insert failed!");
-                    console.log(err);
-                    callback('Failed: Insert failed.');
+            op.checkSame(data.id, function(ret) {
+                if (ret == 'false') {
+                    db.collection('blogContent').insert(data, function (err, ret) {
+                        if (err) {
+                            console.log("Insert failed!");
+                            console.log(err);
+                            db.close();
+                            callback('Failed: Insert failed.');
+                        } else {
+                            console.log("Insert data to blogContent table success");
+                            db.close();
+                            callback('');
+                        }
+                    });
                 } else {
-                    console.log("Insert data to blogContent table success");
-                    callback();
+                    db.close();
+                    callback('Exist');
                 }
-            });
+            });           
         }
-        db.close();
     });
 }
 
-op.deleteBlog = function(title, author, callback) {
+op.deleteBlog = function(data, callback) {
     mongoClient.connect(url, function(err, db) {
         if (err) {
             console.log("Connect to database failed!");
             console.log(err);
+            db.close();
             callback('Falied: Connect to database failed!');
         } else {
-            db.collection('blogContent').deleteOne({'author': author, 'title': title}, function(err, ret) {
-                if (err) {
-                    console.log('Delete data failed.');
-                    console.log(err);
-                    callback('Failed: ' + err);
+            user_op.checkPasswd(data.currentUser, data.passwd, function(ret) {
+                if (ret) {
+                    callback(ret);
                 } else {
-                    console.log('Delete data success.');
+                    db.collection('blogContent').deleteOne({'id': data.id}, function(err, ret) {
+                        if (err) {
+                            console.log('Delete data failed.');
+                            console.log(err);
+                            db.close();
+                            callback('Failed: ' + err);
+                        } else {
+                            console.log('Delete blog success.');
+                            db.close();
+                            callback('');
+                        }
+                    });
                 }
             });
+            
         }
-        db.close();
     });
 }
 
 // Later I will rewrite this function with correct para.
-op.updateBlog = function (id, data) {
-
+op.updateBlog = function (id, data, callback) {
+    mongoClient.connect(url, function(err, db) {
+        if (err) {
+            console.log("Connect to database failed!");
+            console.log(err);
+        } else {
+            console.log("Connect to database success!");
+            op.checkSame(data.id, function(ret) {
+                if (ret == 'false') {
+                    db.collection('blogContent').updateOne({'id': id}, {$set: {'title': data.title, 'content': data.content, 'id': data.id}}, function(err, ret) {
+                        if (err) {
+                            console.log('Update blog data failed.');
+                            console.log(ret);
+                            db.close();
+                            callback('Failed: ' + err);
+                        } else {
+                            console.log('Update blog success.');
+                            db.close();
+                            callback('');
+                        }
+                    });
+                } else {
+                    db.close();
+                    callback('Exist');
+                }
+            });
+        }
+    });
 }
 
 // Find blog with author, return an array of the blog.
@@ -131,6 +207,7 @@ op.findAllBlog = function (callback) {
         } else {
             console.log("Connect to database success!");
             var ret = db.collection('blogContent').find().toArray().then(function(ret) {
+                db.close();
                 callback(ret);
             });
         }

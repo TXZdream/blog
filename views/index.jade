@@ -1,7 +1,10 @@
 html 
-  head 
+  head
     title Blog
+    link(rel="stylesheet" href='http://netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.min.css')
     link(rel='stylesheet' href='stylesheets/angular/angular-material.min.css')
+    link(rel="stylesheet" href='stylesheets/bootstrap.min.css')
+    link(rel="stylesheet" href='stylesheets/angular/textAngular.css')
     link(rel="stylesheet" href='stylesheets/index.css')
     script(src='javascripts/js.cookie.js')
     script(src='javascripts/angular/angular.min.js')
@@ -9,8 +12,11 @@ html
     script(src='javascripts/angular/angular-aria.min.js')
     script(src='javascripts/angular/angular-messages.min.js') 
     script(src='javascripts/angular/angular-material.min.js')
+    script(src='javascripts/angular/textAngular-rangy.min.js')
+    script(src='javascripts/angular/textAngular-sanitize.min.js')
+    script(src='javascripts/angular/textAngular.min.js')
     script(src='javascripts/jquery.min.js')
-    script(src='javascripts/validate.js')
+    script(src='javascripts/jquery.md5.js')
     script(src='javascripts/index.js')
   body
     div(id="main" ng-app="blog")
@@ -27,23 +33,33 @@ html
           div(id="list")
             br
             md-card(class="card")
-              md-input-container(class="md-block")
-                label 搜索 标题、作者或标签
-                input(ng-model="findMessage")
-              md-content(flex)
-                div(class="list")
-                  md-list
+              //- 搜索功能暂不加入
+              //- md-input-container(class="md-block")
+              //-   label 输入标题以搜索
+              //-   input(ng-model="findMessage")
+              //- md-content(flex)
+              div(class="list")
+                md-content
+                  h2(ng-if='!list.length') 当前没有任何博客
+                  md-list(ng-if="list.length" flex)
+                    md-subheader {{list.length}}个博客
                     md-list-item(class="md-3-line" ng-repeat="item in list" ng-click="changeContent(item)")
-                      h3 {{item.title}}
+                      div(class="md-list-item-text" layout="column")
+                        h3  {{item.title}}
+                        p {{getTagString(item)}}
+                        p 作者： {{item.author}}
           div(ng-controller="blogContent" id="content")
             br
             md-card(class="card")
               md-content(flex)
                 div(class="content")
+                  h1(ng-if="!articleContent.title") 请从左边选择一篇文章来查看
                   h1 {{articleContent.title}}
                   p {{getAuthor()}}
-                  br
-                  p {{articleContent.content}}
+                  span(ng-if="articleContent.tags.length") 标签：
+                  span(class="md-3-line" ng-repeat="tag in articleContent.tags") {{tag}}
+                  br(ng-if="!articleContent.tags.length")
+                  div(ta-bind='text' ng-model="articleContent.content")
               md-content
                 div
                   md-fab-speed-dial(md-direction='up' class='md-scale' layout-align="end end")
@@ -53,5 +69,9 @@ html
                     md-fab-actions
                       md-button(class='md-fab' ng-click="addBlog($event)")
                         md-icon(md-svg-src='images/add.svg')
-                      md-button(class='md-fab' ng-click="editBlog($event)")
+                      md-button(class='md-fab' ng-click="editBlog($event)" ng-if="!!articleContent.title")
                         md-icon(md-svg-src='images/edit.svg')
+                      md-button(class='md-fab' ng-click="removeBlog($event)" ng-if="!!articleContent.title")
+                        md-icon(md-svg-src='images/delete.svg')
+                      md-button(class='md-fab' ng-click="showProjectMessage($event)")
+                        md-icon(md-svg-src='images/link.svg')

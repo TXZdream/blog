@@ -13,7 +13,7 @@ router.get('/', function(req, res, next) {
 
 router.post('/login', function(req, res, next) {
   console.log('Post data to /users/login.');
-  console.log(req.body);
+  // console.log(req.body);
   if (login_check(req.body)) {
     user_op.checkPasswd(req.body.user, req.body.passwd, function(err) {
       if (err) {
@@ -50,7 +50,7 @@ router.post('/register', function(req, res, next) {
     });
 });
 
-router.get('/check', function(e9req, res, next) {
+router.get('/check', function(req, res, next) {
   console.log('Check if the username has been used.');
   user_op.findUser(req.query.user, function(ret) {
     if (ret == '') {
@@ -58,6 +58,13 @@ router.get('/check', function(e9req, res, next) {
     } else {
       res.end('Used');
     }
+  });
+});
+
+router.post('/userdata', function(req, res, next) {
+  console.log('Get user data.');
+  user_op.getUserData(req.body.user, req.body.passwd, function(data) {
+    res.end(JSON.stringify(data));
   });
 });
 

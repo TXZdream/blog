@@ -3,7 +3,7 @@ var url = 'mongodb://localhost:27017/blog';
 var op = {};
 
 op.addUser = function(data, callback) {
-    console.log(data);
+    // console.log(data);
     mongoClient.connect(url, function(err, db) {
         if (err) {
             console.log("Connect to database failed!");
@@ -52,7 +52,7 @@ op.updatePasswdWithPassword = function(user, oldPasswd, newPasswd) {
                         db.collection('user').updateOne({'name': user},{$set: {'passwd': replacePasswd}});
                     } catch (err) {
                         console.log("Update password failed.");
-                        console.log("err");
+                        console.log(err);
                     }
                 }
             }
@@ -77,20 +77,48 @@ op.checkPasswd = function(name, passwd, callback) {
         if (err) {
             console.log("Connect to database failed!");
             console.log(err);
+            db.close();
+            callback('Failed: ' + err);
         } else {
             var Spasswd = require('crypto').createHash('md5').update(passwd).digest('hex');
             var ret = db.collection('user').findOne({'name': name, 'passwd': Spasswd}, function(err, ret) {
                 if (err) {
                     console.log('Find failed.');
                     cosole.log(err);
+                    db.close();
+                    callback('Failed');
                 } else {
                     if (ret) {
                         console.log("Find user with true password.");
+                        db.close();
                         callback('');
                     } else {
                         console.log('Failed: Invalid user or password.');
+                        db.close();
                         callback('Failed: Invalid user or password.');
                     }
+                }
+            });
+        }
+    });
+}
+
+op.getUserData = function(name, passwd, callback) {
+     mongoClient.connect(url, function(err, db) {
+        if (err) {
+            console.log("Connect to database failed!");
+            console.log(err);
+        } else {
+            // console.log(name + ' ' + passwd);
+            var Spasswd = require('crypto').createHash('md5').update(passwd).digest('hex');
+            db.collection('user').findOne({'name': name, 'passwd': Spasswd}, function(err, ret) {
+                if (err) {
+                    console.log('Find user failed.');
+                    callback('Failed');
+                } else {
+                    console.log('Find user data success.');
+                    // console.log(ret);
+                    callback(ret);
                 }
             });
         }
@@ -108,7 +136,7 @@ op.findUser = function(name, callback) {
                     console.log('Find failed.');
                     console.log(err);
                 } else {
-                    console.log(ret);
+                    // console.log(ret);
                     if (ret) {
                         callback('Existed');
                     } else {
